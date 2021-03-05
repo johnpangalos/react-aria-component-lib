@@ -67,7 +67,7 @@ export function ComboBox({ label, children }: ComboBoxProps) {
   useEffect(() => {
     if (!layout.virtualizer) return;
     layout.virtualizer.reloadData();
-  }, [state.collection.size]);
+  }, [state.collection.getKeys()]);
 
   return (
     <div className="inline-flex flex-col">
