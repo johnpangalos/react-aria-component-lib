@@ -1,6 +1,7 @@
 import React from "react";
 import { useBreadcrumbs, useBreadcrumbItem } from "@react-aria/breadcrumbs";
 import { AriaBreadcrumbsProps } from "@react-types/breadcrumbs";
+import cn from "classnames";
 
 export function Breadcrumbs(props: AriaBreadcrumbsProps) {
   let { navProps } = useBreadcrumbs(props);
@@ -25,17 +26,16 @@ export function BreadcrumbItem(props) {
       <span
         {...itemProps}
         ref={ref}
-        style={{
-          color: "var(--blue)",
-          textDecoration: props.isCurrent ? null : "underline",
-          fontWeight: props.isCurrent ? "bold" : null,
-          cursor: props.isCurrent ? "default" : "pointer",
-        }}
+        className={cn(
+          props.isCurrent
+            ? "font-bold cursor-default text-blue-800"
+            : "underline cursor-pointer"
+        )}
       >
         {props.children}
       </span>
       {!props.isCurrent && (
-        <span aria-hidden="true" style={{ padding: "0 5px" }}>
+        <span aria-hidden="true" className="px-1">
           {"›"}
         </span>
       )}

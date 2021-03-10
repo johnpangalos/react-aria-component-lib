@@ -1,16 +1,14 @@
 import React, { MutableRefObject, useRef, useMemo, useEffect } from "react";
 import { Node } from "@react-types/shared";
-import { mergeProps } from "@react-aria/utils";
 import { useButton } from "@react-aria/button";
 import { ComboBoxState, useComboBoxState } from "@react-stately/combobox";
-import { useFilter, useCollator, Filter } from "@react-aria/i18n";
+import { useFilter, useCollator } from "@react-aria/i18n";
 import { useListBox, useOption } from "@react-aria/listbox";
-import { useOverlay, DismissButton } from "@react-aria/overlays";
-import { useComboBox, AriaComboBoxProps } from "@react-aria/combobox";
-import { Item } from "@react-stately/collections";
-import { Virtualizer, VirtualizerItem } from "@react-aria/virtualizer";
-import { ReusableView, Rect } from "@react-stately/virtualizer";
+import { useOverlay } from "@react-aria/overlays";
+import { useComboBox } from "@react-aria/combobox";
+import { Virtualizer } from "@react-aria/virtualizer";
 import { ListLayout } from "@react-stately/layout";
+import { mergeProps } from "@react-aria/utils";
 
 export { Item } from "@react-stately/collections";
 
@@ -36,8 +34,8 @@ export function ComboBox({ label, children }: ComboBoxProps) {
 
   const {
     buttonProps: triggerProps,
-    inputProps,
     listBoxProps,
+    inputProps,
     labelProps,
   } = useComboBox(
     {
@@ -67,7 +65,7 @@ export function ComboBox({ label, children }: ComboBoxProps) {
   useEffect(() => {
     if (!layout.virtualizer) return;
     layout.virtualizer.reloadData();
-  }, [state.collection.getKeys()]);
+  }, [state.collection.size]);
 
   return (
     <div className="inline-flex flex-col">
@@ -98,6 +96,7 @@ export function ComboBox({ label, children }: ComboBoxProps) {
         </div>
         {state.isOpen && (
           <ListBoxPopup
+            {...listBoxProps}
             layout={layout}
             shouldUseVirtualFocus
             listBoxRef={listBoxRef}
@@ -127,6 +126,7 @@ function ListBoxPopup({
   state,
   shouldUseVirtualFocus,
   layout,
+  ...otherProps
 }: ListBoxPopupProps) {
   const { listBoxProps } = useListBox(
     {
@@ -134,6 +134,7 @@ function ListBoxPopup({
       disallowEmptySelection: true,
       isVirtualized: true,
       keyboardDelegate: layout,
+      ...otherProps,
     },
     state,
     listBoxRef
@@ -153,7 +154,7 @@ function ListBoxPopup({
     <div {...overlayProps} ref={popoverRef}>
       <ul
         className="shadow-md bg-gray-100 pl-2 absolute w-full"
-        {...listBoxProps}
+        {...mergeProps(listBoxProps, otherProps)}
         ref={listBoxRef}
       >
         <Virtualizer
@@ -162,7 +163,7 @@ function ListBoxPopup({
           ref={virtualizerRef}
           sizeToFit="height"
           scrollDirection="vertical"
-          className="h-48"
+          className="max-h-48"
         >
           {(type, item) => {
             if (type !== "item") return;
@@ -191,7 +192,6 @@ function Option({ item, state, shouldUseVirtualFocus }: OptionProps) {
   let ref = useRef(null);
   let isDisabled = state.disabledKeys.has(item.key);
   let isSelected = state.selectionManager.isSelected(item.key);
-  let isFocused = state.selectionManager.focusedKey === item.key;
 
   let { optionProps } = useOption(
     {
@@ -205,9 +205,6 @@ function Option({ item, state, shouldUseVirtualFocus }: OptionProps) {
     state,
     ref
   );
-
-  let backgroundColor;
-  let color = "black";
 
   return (
     <li {...optionProps} ref={ref}>

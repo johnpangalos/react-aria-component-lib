@@ -294,7 +294,6 @@ packages:
       '@react-stately/toggle': 3.2.1_react@17.0.1
       '@react-types/checkbox': 3.2.2_react@17.0.1
       react: 17.0.1
-    dev: false
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1
     resolution:
